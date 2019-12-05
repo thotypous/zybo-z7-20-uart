@@ -23,5 +23,4 @@ clean:
 	rm -rf Top
 
 superclean: clean
-	make -C sw clean
 	make -C vivado clean
