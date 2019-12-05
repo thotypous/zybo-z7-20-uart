@@ -1,0 +1,10 @@
+# Verilog files compiled with bsc
+/src/verilog/mk*.v
+
+# Vivado project dir
+/zynq_serial
+
+# Vivado log files
+/*.log
+/*.jou
+/.Xil
