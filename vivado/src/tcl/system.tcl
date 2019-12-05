@@ -164,54 +164,21 @@ CONFIG.DATA_WIDTH {32} \
 CONFIG.FREQ_HZ {25000000} \
 CONFIG.PROTOCOL {AXI4} \
  ] $M_AXI
-  set S_AXI [ create_bd_intf_port -mode Slave -vlnv xilinx.com:interface:aximm_rtl:1.0 S_AXI ]
-  set_property -dict [ list \
-CONFIG.ADDR_WIDTH {32} \
-CONFIG.ARUSER_WIDTH {0} \
-CONFIG.AWUSER_WIDTH {0} \
-CONFIG.BUSER_WIDTH {0} \
-CONFIG.CLK_DOMAIN {system_ext_clk_in} \
-CONFIG.DATA_WIDTH {64} \
-CONFIG.FREQ_HZ {25000000} \
-CONFIG.HAS_BRESP {1} \
-CONFIG.HAS_BURST {1} \
-CONFIG.HAS_CACHE {1} \
-CONFIG.HAS_LOCK {1} \
-CONFIG.HAS_PROT {1} \
-CONFIG.HAS_QOS {1} \
-CONFIG.HAS_REGION {1} \
-CONFIG.HAS_RRESP {1} \
-CONFIG.HAS_WSTRB {1} \
-CONFIG.ID_WIDTH {4} \
-CONFIG.MAX_BURST_LENGTH {256} \
-CONFIG.NUM_READ_OUTSTANDING {8} \
-CONFIG.NUM_WRITE_OUTSTANDING {8} \
-CONFIG.PROTOCOL {AXI4} \
-CONFIG.READ_WRITE_MODE {READ_WRITE} \
-CONFIG.RUSER_WIDTH {0} \
-CONFIG.SUPPORTS_NARROW_BURST {1} \
-CONFIG.WUSER_WIDTH {0} \
- ] $S_AXI
 
   # Create ports
   set FCLK_RESET0_N [ create_bd_port -dir O FCLK_RESET0_N ]
   set ext_clk_in [ create_bd_port -dir I -type clk ext_clk_in ]
   set_property -dict [ list \
-CONFIG.ASSOCIATED_BUSIF {S_AXI:M_AXI} \
+CONFIG.ASSOCIATED_BUSIF {M_AXI} \
 CONFIG.FREQ_HZ {25000000} \
  ] $ext_clk_in
+  set irq_in [ create_bd_port -dir I -type intr irq_in ]
 
   # Create instance: axi_interconnect_0, and set properties
   set axi_interconnect_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_interconnect:2.1 axi_interconnect_0 ]
   set_property -dict [ list \
 CONFIG.NUM_MI {1} \
  ] $axi_interconnect_0
-
-  # Create instance: axi_interconnect_1, and set properties
-  set axi_interconnect_1 [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_interconnect:2.1 axi_interconnect_1 ]
-  set_property -dict [ list \
-CONFIG.NUM_MI {1} \
- ] $axi_interconnect_1
 
   # Create instance: proc_sys_reset_0, and set properties
   set proc_sys_reset_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:proc_sys_reset:5.0 proc_sys_reset_0 ]
@@ -364,6 +331,7 @@ CONFIG.PCW_I2C_RESET_POLARITY {Active Low} \
 CONFIG.PCW_I2C_RESET_SELECT {<Select>} \
 CONFIG.PCW_IOPLL_CTRL_FBDIV {30} \
 CONFIG.PCW_IO_IO_PLL_FREQMHZ {1000.000} \
+CONFIG.PCW_IRQ_F2P_INTR {1} \
 CONFIG.PCW_IRQ_F2P_MODE {DIRECT} \
 CONFIG.PCW_MIO_0_DIRECTION {inout} \
 CONFIG.PCW_MIO_0_IOTYPE {LVCMOS 3.3V} \
@@ -855,6 +823,7 @@ CONFIG.PCW_USB_RESET_POLARITY {Active Low} \
 CONFIG.PCW_USB_RESET_SELECT {Share reset pin} \
 CONFIG.PCW_USE_AXI_NONSECURE {0} \
 CONFIG.PCW_USE_CROSS_TRIGGER {0} \
+CONFIG.PCW_USE_FABRIC_INTERRUPT {1} \
 CONFIG.PCW_USE_M_AXI_GP0 {1} \
 CONFIG.PCW_USE_S_AXI_GP0 {0} \
 CONFIG.PCW_USE_S_AXI_HP0 {1} \
@@ -1126,22 +1095,20 @@ CONFIG.PCW_WDT_WDT_IO.VALUE_SRC {DEFAULT} \
  ] $processing_system7_0
 
   # Create interface connections
-  connect_bd_intf_net -intf_net S_AXI_1 [get_bd_intf_ports S_AXI] [get_bd_intf_pins axi_interconnect_1/S00_AXI]
   connect_bd_intf_net -intf_net axi_interconnect_0_M00_AXI [get_bd_intf_ports M_AXI] [get_bd_intf_pins axi_interconnect_0/M00_AXI]
-  connect_bd_intf_net -intf_net axi_interconnect_1_M00_AXI [get_bd_intf_pins axi_interconnect_1/M00_AXI] [get_bd_intf_pins processing_system7_0/S_AXI_HP0]
   connect_bd_intf_net -intf_net processing_system7_0_DDR [get_bd_intf_ports DDR] [get_bd_intf_pins processing_system7_0/DDR]
   connect_bd_intf_net -intf_net processing_system7_0_FIXED_IO [get_bd_intf_ports FIXED_IO] [get_bd_intf_pins processing_system7_0/FIXED_IO]
   connect_bd_intf_net -intf_net processing_system7_0_M_AXI_GP0 [get_bd_intf_pins axi_interconnect_0/S00_AXI] [get_bd_intf_pins processing_system7_0/M_AXI_GP0]
 
   # Create port connections
-  connect_bd_net -net ext_clk_in_1 [get_bd_ports ext_clk_in] [get_bd_pins axi_interconnect_0/ACLK] [get_bd_pins axi_interconnect_0/M00_ACLK] [get_bd_pins axi_interconnect_0/S00_ACLK] [get_bd_pins axi_interconnect_1/ACLK] [get_bd_pins axi_interconnect_1/M00_ACLK] [get_bd_pins axi_interconnect_1/S00_ACLK] [get_bd_pins proc_sys_reset_0/slowest_sync_clk] [get_bd_pins processing_system7_0/M_AXI_GP0_ACLK] [get_bd_pins processing_system7_0/S_AXI_HP0_ACLK]
-  connect_bd_net -net proc_sys_reset_0_interconnect_aresetn [get_bd_pins axi_interconnect_0/ARESETN] [get_bd_pins axi_interconnect_1/ARESETN] [get_bd_pins proc_sys_reset_0/interconnect_aresetn]
-  connect_bd_net -net proc_sys_reset_0_peripheral_aresetn [get_bd_pins axi_interconnect_0/M00_ARESETN] [get_bd_pins axi_interconnect_0/S00_ARESETN] [get_bd_pins axi_interconnect_1/M00_ARESETN] [get_bd_pins axi_interconnect_1/S00_ARESETN] [get_bd_pins proc_sys_reset_0/peripheral_aresetn]
+  connect_bd_net -net ext_clk_in_1 [get_bd_ports ext_clk_in] [get_bd_pins axi_interconnect_0/ACLK] [get_bd_pins axi_interconnect_0/M00_ACLK] [get_bd_pins axi_interconnect_0/S00_ACLK] [get_bd_pins proc_sys_reset_0/slowest_sync_clk] [get_bd_pins processing_system7_0/M_AXI_GP0_ACLK] [get_bd_pins processing_system7_0/S_AXI_HP0_ACLK]
+  connect_bd_net -net irq_in_1 [get_bd_ports irq_in] [get_bd_pins processing_system7_0/IRQ_F2P]
+  connect_bd_net -net proc_sys_reset_0_interconnect_aresetn [get_bd_pins axi_interconnect_0/ARESETN] [get_bd_pins proc_sys_reset_0/interconnect_aresetn]
+  connect_bd_net -net proc_sys_reset_0_peripheral_aresetn [get_bd_pins axi_interconnect_0/M00_ARESETN] [get_bd_pins axi_interconnect_0/S00_ARESETN] [get_bd_pins proc_sys_reset_0/peripheral_aresetn]
   connect_bd_net -net processing_system7_0_FCLK_RESET0_N [get_bd_ports FCLK_RESET0_N] [get_bd_pins proc_sys_reset_0/ext_reset_in] [get_bd_pins processing_system7_0/FCLK_RESET0_N]
 
   # Create address segments
   create_bd_addr_seg -range 0x00001000 -offset 0x43C00000 [get_bd_addr_spaces processing_system7_0/Data] [get_bd_addr_segs M_AXI/Reg] SEG_M_AXI_Reg
-  create_bd_addr_seg -range 0x40000000 -offset 0x00000000 [get_bd_addr_spaces S_AXI] [get_bd_addr_segs processing_system7_0/S_AXI_HP0/HP0_DDR_LOWOCM] SEG_processing_system7_0_HP0_DDR_LOWOCM
 
   # Perform GUI Layout
   regenerate_bd_layout -layout_string {
@@ -1149,25 +1116,23 @@ CONFIG.PCW_WDT_WDT_IO.VALUE_SRC {DEFAULT} \
 #  -string -flagsOSRD
 preplace port DDR -pg 1 -y 60 -defaultsOSRD
 preplace port FCLK_RESET0_N -pg 1 -y 320 -defaultsOSRD
-preplace port S_AXI -pg 1 -y 70 -defaultsOSRD
+preplace port irq_in -pg 1 -y 20 -defaultsOSRD
 preplace port M_AXI -pg 1 -y 200 -defaultsOSRD
 preplace port FIXED_IO -pg 1 -y 80 -defaultsOSRD
 preplace port ext_clk_in -pg 1 -y 250 -defaultsOSRD
 preplace inst proc_sys_reset_0 -pg 1 -lvl 1 -y 350 -defaultsOSRD
-preplace inst axi_interconnect_0 -pg 1 -lvl 4 -y 200 -defaultsOSRD
-preplace inst axi_interconnect_1 -pg 1 -lvl 2 -y 130 -defaultsOSRD
-preplace inst processing_system7_0 -pg 1 -lvl 3 -y 140 -defaultsOSRD
-preplace netloc S_AXI_1 1 0 2 NJ 70 NJ
-preplace netloc processing_system7_0_DDR 1 3 2 NJ 60 NJ
-preplace netloc processing_system7_0_M_AXI_GP0 1 3 1 1140
-preplace netloc processing_system7_0_FCLK_RESET0_N 1 0 5 30 260 NJ 260 NJ 290 1140 320 NJ
-preplace netloc proc_sys_reset_0_interconnect_aresetn 1 1 3 370 270 NJ 270 1150
-preplace netloc processing_system7_0_FIXED_IO 1 3 2 NJ 80 NJ
-preplace netloc axi_interconnect_0_M00_AXI 1 4 1 NJ
-preplace netloc proc_sys_reset_0_peripheral_aresetn 1 1 3 390 280 NJ 280 1170
-preplace netloc axi_interconnect_1_M00_AXI 1 2 1 N
-preplace netloc ext_clk_in_1 1 0 4 20 170 380 10 690 10 1160
-levelinfo -pg 1 0 200 540 920 1320 1490 -top 0 -bot 440
+preplace inst axi_interconnect_0 -pg 1 -lvl 3 -y 200 -defaultsOSRD
+preplace inst processing_system7_0 -pg 1 -lvl 2 -y 140 -defaultsOSRD
+preplace netloc processing_system7_0_DDR 1 2 2 NJ 60 NJ
+preplace netloc processing_system7_0_M_AXI_GP0 1 2 1 1140
+preplace netloc processing_system7_0_FCLK_RESET0_N 1 0 4 30 260 NJ 270 1140 320 NJ
+preplace netloc irq_in_1 1 0 2 NJ 20 380
+preplace netloc proc_sys_reset_0_interconnect_aresetn 1 1 2 N 370 1150
+preplace netloc processing_system7_0_FIXED_IO 1 2 2 NJ 80 NJ
+preplace netloc axi_interconnect_0_M00_AXI 1 3 1 NJ
+preplace netloc proc_sys_reset_0_peripheral_aresetn 1 1 2 380 280 1160
+preplace netloc ext_clk_in_1 1 0 3 20 160 370 10 1170
+levelinfo -pg 1 0 200 920 1320 1490 -top 0 -bot 440
 ",
 }
 
