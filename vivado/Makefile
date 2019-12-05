@@ -24,7 +24,7 @@ $(bitstream): src/tcl/make_bitstream.tcl $(verilog_srcs) src/constrs/base.xdc | 
 	vivado -mode tcl -source src/tcl/make_bitstream.tcl
 bitstream: $(bitstream)
 
-sdcard/BOOT.BIN: boot.bif boot/zynq_fsbl.elf boot/u-boot.elf | $(bitstream)
+sdcard/BOOT.BIN: boot.bif boot/zynq_fsbl.elf boot/u-boot.elf $(bitstream)
 	bootgen -image $< -w -o $@
 
 clean:

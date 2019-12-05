@@ -29,6 +29,10 @@ module top
     FIXED_IO_ps_clk,
     FIXED_IO_ps_porb,
     FIXED_IO_ps_srstb,
+    jd_rx,
+    jd_tx,
+    je_rx,
+    je_tx,
     clk);
 
   inout [14:0]DDR_addr;
@@ -53,6 +57,11 @@ module top
   inout FIXED_IO_ps_clk;
   inout FIXED_IO_ps_porb;
   inout FIXED_IO_ps_srstb;
+
+  input  [4:0] jd_rx;
+  output [4:0] jd_tx;
+  input  [4:0] je_rx;
+  output [4:0] je_tx;
 
   input clk;
 
@@ -210,7 +219,25 @@ module top
    .axi_slave_bid (M_AXI_bid),
    .axi_slave_bresp (M_AXI_bresp),
    
-   .axi_irq(irq)
+   .axi_irq(irq),
+
+   .serial_0_tx(jd_tx[0]),
+   .serial_1_tx(jd_tx[1]),
+   .serial_2_tx(jd_tx[2]),
+   .serial_3_tx(jd_tx[3]),
+   .serial_4_tx(je_tx[0]),
+   .serial_5_tx(je_tx[1]),
+   .serial_6_tx(je_tx[2]),
+   .serial_7_tx(je_tx[3]),
+
+   .serial_0_rx(jd_rx[0]),
+   .serial_1_rx(jd_rx[1]),
+   .serial_2_rx(jd_rx[2]),
+   .serial_3_rx(jd_rx[3]),
+   .serial_4_rx(je_rx[0]),
+   .serial_5_rx(je_rx[1]),
+   .serial_6_rx(je_rx[2]),
+   .serial_7_rx(je_rx[3])
   );
   IBUFG ibufg_gclk (.I(clk), .O(gclk_i));
   BUFG  bufg_host_clk (.I(host_clk_i), .O(host_clk));
