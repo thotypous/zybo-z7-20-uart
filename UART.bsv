@@ -37,7 +37,8 @@ Phase maxPhase = fromInteger(baudCycles - 1);
 
 
 module mkUartRx(UartRx);
-	Wire#(Bit#(1)) inb <- mkBypassWire;
+	Reg#(Bit#(3)) asyncSync <- mkReg(0);
+	let inb = asyncSync[2];
 	Reg#(Bit#(10)) shiftReg <- mkReg(0);  // {stop_bit, data, start_bit}
 	let idle = shiftReg[0] == 0;   // the UartRx is idle when the start bit (0) is in place
 	Array#(Reg#(Bool)) pending <- mkCRegU(2);
@@ -69,7 +70,7 @@ module mkUartRx(UartRx);
 
 	interface UartRxWires wires;
 		method Action put(Bit#(1) b);
-			inb <= b;
+			asyncSync <= {asyncSync[1:0], b};
 		endmethod
 	endinterface
 endmodule
