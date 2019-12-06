@@ -58,10 +58,10 @@ module top
   inout FIXED_IO_ps_porb;
   inout FIXED_IO_ps_srstb;
 
-  input  [4:0] jd_rx;
-  output [4:0] jd_tx;
-  input  [4:0] je_rx;
-  output [4:0] je_tx;
+  input  [3:0] jd_rx;
+  output [3:0] jd_tx;
+  input  [3:0] je_rx;
+  output [3:0] je_tx;
 
   input clk;
 
@@ -218,7 +218,7 @@ module top
    .axi_slave_bready (M_AXI_bready),
    .axi_slave_bid (M_AXI_bid),
    .axi_slave_bresp (M_AXI_bresp),
-   
+
    .axi_irq(irq),
 
    .serial_0_tx(jd_tx[0]),
