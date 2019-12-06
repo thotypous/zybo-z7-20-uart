@@ -172,12 +172,14 @@ module mkUartRxCtl(UartRxCtl);
 	endrule
 
 	rule capture_data;
-		if (x16_en && over_sample_cnt_done)
+		if (x16_en && over_sample_cnt_done) begin
 			if (state == DATA) begin
 				rx_data_reg[bit_cnt] <= rxd;
 				rx_data_rdy_reg <= (bit_cnt == 3'd7); // counting from 0
-			end else
-				rx_data_rdy_reg <= False;
+			end
+		end else begin
+			rx_data_rdy_reg <= False;
+		end
 	endrule
 
 	rule frame_err_generation(x16_en == True);
