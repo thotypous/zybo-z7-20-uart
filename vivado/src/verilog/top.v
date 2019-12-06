@@ -4,7 +4,7 @@
 
 `define ZYNQ_CLK_PERIOD  8.0
 `define RC_CLK_MULT      8.0
-`define RC_CLK_DIVIDE   32.0
+`define RC_CLK_DIVIDE   20.0
 
 
 module top
