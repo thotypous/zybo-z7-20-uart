@@ -95,7 +95,7 @@ set proj_dir [get_property directory [current_project]]
 
 # Set project properties
 set obj [get_projects zynq_serial]
-set_property "board_part" "digilentinc.com:zybo-z7-20:part0:1.0" $obj
+set_property "board_part" "digilentinc.com:zybo-z7-20:part0:1.1" $obj
 set_property "default_lib" "xil_defaultlib" $obj
 set_property "generate_ip_upgrade_log" "0" $obj
 set_property "sim.ip.auto_export_scripts" "1" $obj
